@@ -1,4 +1,4 @@
-package daythree
+package day3
 
 import (
 	"bufio"
@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-func A() {
+func B() {
     pwd, _ := os.Getwd()
-    file, err := os.Open(pwd + "/daythree/input.txt")
+    file, err := os.Open(pwd + "/day3/input.txt")
 
     if err != nil {
         fmt.Println(err)
@@ -20,12 +20,14 @@ func A() {
     scanner := bufio.NewScanner(file)
     sum := 0
     for scanner.Scan() {
-        content := scanner.Text()
-        first := content[0:len(content)/2]
-        second := content[len(content)/2:]
+        first := scanner.Text()
+        scanner.Scan()
+        second := scanner.Text()
+        scanner.Scan()
+        third := scanner.Text()
 
         for _, i := range first {
-            if strings.ContainsRune(second, i) {
+            if strings.ContainsRune(second, i) && strings.ContainsRune(third, i) {
                 sum = sum + getPriorityForRune(i)
                 break
             }
@@ -33,12 +35,5 @@ func A() {
     }
 
     fmt.Printf("%d\n", sum)
-}
-
-func getPriorityForRune(i rune) int {
-    if i <= 'z' && i >= 'a' {
-        return int(i)-96
-    }
-    return int(i)-38
 }
 
