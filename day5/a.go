@@ -4,20 +4,27 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
-type stack []string
-
-func (s stack) Push(v string) stack {
-    return append(s, v)
+type stack struct {
+    s []string
 }
 
-func (s stack) Pop() (stack, string) {
-    l := len(s)
-    return  s[:l-1], s[l-1]
+func (s *stack) Push(v string) {
+    s.s = append(s.s, v)
 }
 
+func (s *stack) Pop() string {
+    l := len(s.s)
+    res := s.s[l-1]
+    s.s = s.s[:l-1]
+    return res
+}
+ func NewStack() *stack {
+     return &stack { make([]string,0)}
+ }
 func A() {
     pwd, _ := os.Getwd()
     file, err := os.Open(pwd + "/day5/testinput.txt")
@@ -29,26 +36,53 @@ func A() {
     defer file.Close()
 
     scanner := bufio.NewScanner(file)
-    // count := 0
+    initialized := false
+    var stacks []*stack
+    //create stacks
     for scanner.Scan() {
         if scanner.Text() == "" {
             break
         }
         line := strings.Split(scanner.Text(), "")
         numberOfStacks := (len(line)+1)/4
-        fmt.Printf("%d StackCount: %d\n", len(line), numberOfStacks)
+        if !initialized {
+            initialized = true
+            stacks = make([]*stack, numberOfStacks)
+            for i := 0; i < numberOfStacks; i++ {
+                stacks[i] = NewStack()
+            }
+        }
         for i, c := range line {
-            if c == "[" || c == "]" || c == " " {
+            if c == "1" {
+                break
+            } else if c == "[" || c == "]" || c == " " {
 
             } else {
-                fmt.Printf("%d %d  %s\n",i, i/(numberOfStacks+1), c)
+                // fmt.Printf("put %s on stack %d\n", c, i/(numberOfStacks+1)+1)
+                stacks[i/(numberOfStacks+1)].Push(c)
             }
-            // itemArr := line[i*numberOfStacks:i*numberOfStacks+4]
-            // item := strings.Join(itemArr, "")
-            // fmt.Printf("%s\n", item)
         }
-        break
     }
-
+    
+    // move 1 from 2 to 1
+    for scanner.Scan() {
+        line := strings.Split(scanner.Text(), " ")
+        n,f,t := getValues(line)
+        
+        for i := 0; i < n; i++ {
+            fval := stacks[f-1].Pop()
+            stacks[t-1].Push(fval)
+        }
+    }
     // fmt.Printf("%d\n", count)
+    for _, c := range stacks {
+        fmt.Printf("%s", c.Pop())
+    }
+}
+
+func getValues(s []string) (int, int, int) {
+    n, _ := strconv.Atoi(s[1])
+    f, _ := strconv.Atoi(s[3])
+    t, _ := strconv.Atoi(s[5])
+    return n,f,t
 }
