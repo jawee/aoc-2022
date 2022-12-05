@@ -19,14 +19,16 @@ func (s *stack) Push(v string) {
 func (s *stack) Pop() string {
     l := len(s.s)
     if l == 0 {
-        return ""
+        fmt.Printf("Cant pop enough\n")
+        panic("")
+        // return ""
     }
     res := s.s[l-1]
     s.s = s.s[:l-1]
     return res
 }
 func (s *stack) Print(n int) {
-    fmt.Printf("Stack %d\n", n)
+    fmt.Printf("%d: ", n)
     for _, a := range s.s {
         fmt.Printf("%s", a)
     }
@@ -42,6 +44,7 @@ func NewStack() *stack {
 }
 func A() {
     pwd, _ := os.Getwd()
+    // file, err := os.Open(pwd + "/day5/testinput.txt")
     file, err := os.Open(pwd + "/day5/input.txt")
 
     if err != nil {
@@ -53,6 +56,7 @@ func A() {
     scanner := bufio.NewScanner(file)
     initialized := false
     var stacks []*stack
+
     //create stacks
     for scanner.Scan() {
         if scanner.Text() == "" {
@@ -73,18 +77,18 @@ func A() {
             } else if c == "[" || c == "]" || c == " " {
 
             } else {
-                // fmt.Printf("put %s on stack %d\n", c, i/(numberOfStacks+1)+1)
-                stacks[i/(numberOfStacks+1)].Push(c)
+                stacks[i/4].Push(c)
             }
         }
     }
     
     
-    for _, c := range stacks {
+    for i, c := range stacks {
         c.Reverse()
-        // c.Print(i+1)
+        c.Print(i+1)
     }
     // move 1 from 2 to 1
+    count := 0
     for scanner.Scan() {
         line := strings.Split(scanner.Text(), " ")
         n,f,t := getValues(line)
@@ -95,9 +99,7 @@ func A() {
                 stacks[t-1].Push(fval)
             }
         }
-        // for i, c := range stacks {
-        //     c.Print(i+1)
-        // }
+        count++
     }
     // fmt.Printf("%d\n", count)
     for _, c := range stacks {
