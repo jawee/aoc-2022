@@ -18,16 +18,31 @@ func (s *stack) Push(v string) {
 
 func (s *stack) Pop() string {
     l := len(s.s)
+    if l == 0 {
+        return ""
+    }
     res := s.s[l-1]
     s.s = s.s[:l-1]
     return res
 }
- func NewStack() *stack {
-     return &stack { make([]string,0)}
- }
+func (s *stack) Print(n int) {
+    fmt.Printf("Stack %d\n", n)
+    for _, a := range s.s {
+        fmt.Printf("%s", a)
+    }
+    fmt.Printf("\n")
+}
+func (s *stack) Reverse() {
+    for i, j := 0, len(s.s)-1; i < j; i, j = i+1, j-1 {
+        s.s[i], s.s[j] = s.s[j], s.s[i]
+    }
+}
+func NewStack() *stack {
+    return &stack { make([]string,0)}
+}
 func A() {
     pwd, _ := os.Getwd()
-    file, err := os.Open(pwd + "/day5/testinput.txt")
+    file, err := os.Open(pwd + "/day5/input.txt")
 
     if err != nil {
         fmt.Println(err)
@@ -64,6 +79,11 @@ func A() {
         }
     }
     
+    
+    for _, c := range stacks {
+        c.Reverse()
+        // c.Print(i+1)
+    }
     // move 1 from 2 to 1
     for scanner.Scan() {
         line := strings.Split(scanner.Text(), " ")
@@ -71,13 +91,19 @@ func A() {
         
         for i := 0; i < n; i++ {
             fval := stacks[f-1].Pop()
-            stacks[t-1].Push(fval)
+            if fval != "" {
+                stacks[t-1].Push(fval)
+            }
         }
+        // for i, c := range stacks {
+        //     c.Print(i+1)
+        // }
     }
     // fmt.Printf("%d\n", count)
     for _, c := range stacks {
         fmt.Printf("%s", c.Pop())
     }
+    fmt.Printf("\n")
 }
 
 func getValues(s []string) (int, int, int) {
