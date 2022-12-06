@@ -20,17 +20,17 @@ func A() {
     scanner := bufio.NewScanner(file)
     for scanner.Scan() {
         input := strings.Split(scanner.Text(), "")
-        posOfMarker := getPosOfMarker(input)
+        posOfMarker := getPosOfMarker(input, 4)
         fmt.Printf("%d\n", posOfMarker)
     }
 }
 
-func getPosOfMarker(input []string) int {
+func getPosOfMarker(input []string, n int) int {
     for i := range input {
-        if i < 4 {
+        if i < n {
             continue
         } else {
-            slice := input[i-4:i]
+            slice := input[i-n:i]
             if sliceIsUnique(slice) {
                 return i
             }
