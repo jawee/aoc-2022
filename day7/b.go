@@ -1,3 +1,4 @@
+
 package day7
 
 import (
@@ -8,7 +9,7 @@ import (
 	"strings"
 )
 
-func A() {
+func B() {
     pwd, _ := os.Getwd()
     // file, err := os.Open(pwd + "/day7/testinput.txt")
     file, err := os.Open(pwd + "/day7/input.txt")
@@ -56,78 +57,30 @@ func A() {
 
     _ = calculateSizes(root)
 
-    limit := 100000
-    res := getSumRecurse(root, limit)
+    freeSpace := 70000000-root.size
+    limit := 30000000-freeSpace
+    res := getSmallestDirectoryLargerThanLimit(root, limit)
 
     fmt.Printf("%d\n", res)
 }
 
-func getSumRecurse(node *DirNode, limit int) int {
+func getSmallestDirectoryLargerThanLimit(node *DirNode, limit int) int {
     size := 0
 
-    if node.size <= limit {
-        size += node.size
+    if node.size >= limit {
+        size = node.size
+    }
+    
+    if node.size < limit {
+        return int(^uint(0) >> 1)
     }
 
     for _, n := range node.children {
-        size += getSumRecurse(n, limit)
-    }
-    return size
-}
-
-func calculateSizes(node *DirNode) int {
-    if node == nil {
-        return 0
-    }
-    
-    size := 0
-    for _, c := range node.files {
-        size += c.size
-    }
-
-    for _, d := range node.children {
-        size += calculateSizes(d)
-    }
-
-    node.size = size
-    return size
-}
-
-func findDirNode(slice []*DirNode, name string) int { 
-    for i := range slice {
-        if slice[i].name == name {
-            return i
+        dirSize := getSmallestDirectoryLargerThanLimit(n, limit)
+        if dirSize < size {
+            size = dirSize
         }
     }
-    return -1
-}
-
-func getCommand(str string) string {
-    return str[2:4]
-}
-func isCommand(str string) bool {
-    return str[0] == '$'
-}
-
-func CreateDirNode(name string, parent *DirNode) *DirNode {
-    return &DirNode{
-        name: name,
-        children: make([]*DirNode, 0),
-        files: make([]*File, 0),
-        parent: parent,
-    }
-}
-
-type DirNode struct {
-    name string
-    children []*DirNode
-    files []*File
-    parent *DirNode
-    size int
-}
-
-type File struct {
-    name string
-    size int
+    return size
 }
 
