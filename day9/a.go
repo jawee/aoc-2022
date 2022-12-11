@@ -45,11 +45,11 @@ func move(direction string, n int, head *Coords, tail *Coords, visited map[Coord
         x, y := getDirection(direction)
         head.x = head.x + x
         head.y = head.y + y
-        if (tail.x == head.x-x && tail.y == head.y-y) || getDistance(head, tail) <= 1 {
+        if (tail.x == head.x-x && tail.y == head.y-y) || getDistance(*head, *tail) <= 1 {
             continue
         }
 
-        if getDistance(head, tail) > 1 {
+        if getDistance(*head, *tail) > 1 {
             tail.x = head.x - x
             tail.y = head.y - y
             visited[Coords{tail.x, tail.y}] = true
@@ -58,7 +58,7 @@ func move(direction string, n int, head *Coords, tail *Coords, visited map[Coord
 
     return visited
 }
-func getDistance(head *Coords, tail *Coords) int {
+func getDistance(head Coords, tail Coords) int {
     res := math.Sqrt(math.Pow(float64(head.x-tail.x), 2) + math.Pow(float64(head.y-tail.y), 2))
     return int(res)
 }
