@@ -10,8 +10,8 @@ import (
 
 func A() {
     pwd, _ := os.Getwd()
-    file, err := os.Open(pwd + "/day12/testinput.txt")
-    // file, err := os.Open(pwd + "/day12/input.txt")
+    // file, err := os.Open(pwd + "/day12/testinput.txt")
+    file, err := os.Open(pwd + "/day12/input.txt")
 
     if err != nil {
         fmt.Println(err)
@@ -42,7 +42,9 @@ func A() {
                 end = Coords{i,j}
                 grid[i][j]="z"
             }
+            // fmt.Printf("%s", grid[i][j])
         }
+        // fmt.Printf("\n")
     }
     fmt.Printf("%d\n", findShortestPath(start, end, grid))
 }
@@ -50,11 +52,8 @@ func A() {
 func findShortestPath(start, end Coords, grid [][]string) int {
     // fmt.Printf("%v %v\n", start, end)
 
-    visited := map[Coords]bool{}
-    visited[start] = true
-
-    fmt.Printf("%d\n", len(visited))
-    fmt.Printf("%v\n", visited[end])
+    visited := make([]Coords, 0)
+    visited = append(visited, start)
 
     h := getHeight("a")
 
@@ -76,14 +75,17 @@ func findShortestPath(start, end Coords, grid [][]string) int {
     return min
 }
 
-func printPath(m map[Coords]bool, grid [][]string) {
+func printPath(m []Coords, grid [][]string) {
     fmt.Println("===== Path =====")
+    // for _, c := range m {
+    //     fmt.Printf("%d,%d\n", c.x, c.y)
+    // }
     for i := 0; i < len(grid); i++ {
         for j := 0; j < len(grid[i]); j++ {
             // fmt.Printf("%d,%d\n", i, j)
             // fmt.Printf("%v\n", Coords{i,j})
             // c := Coords{i,j}
-            if m[Coords{x:i,y:j}] {
+            if containsCoords(m, i, j) {
                 fmt.Printf("#")
             } else {
                 fmt.Printf(".")
@@ -91,20 +93,18 @@ func printPath(m map[Coords]bool, grid [][]string) {
         }
         fmt.Printf("\n")
     }
-    // for key, c := range m {
-    //     if c {
-    //         fmt.Printf("%v\n",key)
-    //     }
-    // }
 }
 
-func findShortestPathRec(a, end Coords, prevHeight int, grid [][]string, visited map[Coords]bool) (int, map[Coords]bool) {
-    if a == end {
-        // fmt.Printf("Found end \n")
-        visited[a] = true
-        return 1, visited
+func containsCoords(m []Coords, i, j int) bool {
+    for _, e := range m {
+        if e.x == i && e.y == j {
+            return true
+        }
     }
+    return false
+}
 
+func findShortestPathRec(a, end Coords, prevHeight int, grid [][]string, visited []Coords) (int, []Coords) {
     if a.x >= len(grid) || a.x < 0 {
         return math.MaxInt32, visited
     }
@@ -113,7 +113,9 @@ func findShortestPathRec(a, end Coords, prevHeight int, grid [][]string, visited
         return math.MaxInt32, visited
     }
 
-    if visited[a] {
+
+
+    if containsCoords(visited, a.x, a.y) {
         return math.MaxInt32, visited
     }
 
@@ -128,7 +130,12 @@ func findShortestPathRec(a, end Coords, prevHeight int, grid [][]string, visited
         return math.MaxInt32, visited
     }
 
-    visited[a] = true
+    if a == end {
+        // fmt.Printf("Found end \n")
+        visited = append(visited, a)
+        return 1, visited
+    }
+    visited = append(visited, a)
 
     top, topV := findShortestPathRec(Coords{a.x, a.y-1}, end, h, grid, visited)
     right, rightV := findShortestPathRec(Coords{a.x+1, a.y}, end, h, grid, visited)
@@ -138,7 +145,7 @@ func findShortestPathRec(a, end Coords, prevHeight int, grid [][]string, visited
 
     min := int(math.Min(math.Min(float64(top), float64(right)), math.Min(float64(down), float64(left))))
     if min == math.MaxInt32 {
-        visited[a] = false
+        visited = visited[:len(visited)-2]
         return min, visited
     }
 
