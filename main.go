@@ -1,9 +1,7 @@
 package main
 
-import (
-	"github.com/jawee.se/aoc-2022/day13"
-)
+import "github.com/jawee.se/aoc-2022/day14"
 
 func main() {
-    day13.B()
+    day14.A()
 }
