@@ -67,6 +67,9 @@ func getResult(l1, l2 Obj) Result {
 	}
 
 	if l1.t == 2 && len(l1.list) == 0 {
+        if len(l1.list) == len(l2.list) {
+            return Continue
+        }
 		return True
 	}
 
