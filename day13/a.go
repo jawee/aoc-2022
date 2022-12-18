@@ -10,8 +10,8 @@ import (
 
 func A() {
     pwd, _ := os.Getwd()
-    // file, err := os.Open(pwd + "/day13/testinput.txt")
-    file, err := os.Open(pwd + "/day13/input.txt")
+    file, err := os.Open(pwd + "/day13/testinput.txt")
+    // file, err := os.Open(pwd + "/day13/input.txt")
 
     if err != nil {
         fmt.Println(err)
@@ -45,55 +45,62 @@ func A() {
 
     sum := 0
     for _, pair := range pairs {
-        res := getResult(pair)
+        res := getResult(pair.o1,pair.o2)
         fmt.Printf("Handling pair %d. Got res %d\n", pair.idx, res)
-        sum += res
-        // pair.l1
-        // pair.l2
+        if res == True || res == Continue {
+            sum += pair.idx
+        }
     }
 
     fmt.Printf("%d\n", sum)
 
 }
 
-func getResult(pair Pair) int {
-    for i, o1 := range pair.l1 {
-        if i == len(pair.l2) {
-            return 0
+func getResult(l1,l2 Obj) Result {
+    fmt.Printf("Compare %s - %s\n", l1.ToString(), l2.ToString())
+    if len(l1.list) == 0 {
+        return True
+    }
+    for i, o1 := range l1.list {
+        if i == len(l2.list) {
+            fmt.Printf("Right ran out of items\n")
+            return False
         }
-        o2 := pair.l2[i]
+        o2 := l2.list[i]
         // fmt.Printf("%v < %v\n", o1, o2)
         if o1.t == o2.t && o1.t == 1 {
             //compare ints
             res := getIntResult(o1,o2)
             switch res {
             case True:
-                return pair.idx
+                return True
             case False:
-                return 0
+                return False
             default:
                 continue
             }
         } else if o1.t == o2.t && o1.t == 2 {
             // compare lists
-            res := getListResult(o1,o2)
+            fmt.Printf("Compare lists %s - %s\n", o1.ToString(), o2.ToString())
+            res := getResult(o1,o2)
             switch res {
             case True:
-                return pair.idx
+                return True
             case False:
-                return 0
+                return False
             default:
                 continue
             }
         } else if o1.t == 1 && o2.t == 2 {
             // fmt.Printf("convert o1 to list\n")
+            fmt.Printf("Convert o1 to list\n")
             left := Obj{list:[]Obj{o1},t:2}
-            res := getListResult(left,o2)
+            res := getResult(left,o2)
             switch res {
             case True:
-                return pair.idx
+                return True
             case False:
-                return 0
+                return False
             default:
                 continue
             }
@@ -101,19 +108,24 @@ func getResult(pair Pair) int {
         } else if o1.t == 2 && o2.t == 1 {
             //compare left is list, right is int
             // fmt.Printf("convert o2 to list\n")
+            fmt.Printf("Convert o2 to list\n")
             right := Obj{list:[]Obj{o2},t:2}
-            res := getListResult(o1,right)
+            fmt.Printf("Compare lists\n")
+            res := getResult(o1,right)
             switch res {
             case True:
-                return pair.idx
+                return True
             case False:
-                return 0
+                return False
             default:
                 continue
             }
         }
+        // if i == len(l1.list)-1 {
+        //     return True
+        // }
     }
-    return pair.idx
+    return Continue
 }
 
 type Result int
@@ -124,71 +136,15 @@ const (
     Continue
 )
 
-func getListResult(a Obj, b Obj) Result {
-    // fmt.Printf("Compare lists\n")
-    for i, oa := range a.list {
-        if i == len(b.list) {
-            return False
-        }
-        ob := b.list[i]
-        if oa.t == ob.t && oa.t == 1 {
-            res := getIntResult(oa,ob)
-            switch res {
-            case True:
-                return True
-            case False:
-                return False
-            default:
-                continue
-            }
-        } else if oa.t == ob.t && oa.t == 2 {
-            // compare lists
-            res := getListResult(oa,ob)
-            switch res {
-            case True:
-                return True
-            case False:
-                return False
-            default:
-                continue
-            }
-        } else if oa.t == 1 && ob.t == 2 {
-            left := Obj{list:[]Obj{oa},t:2}
-            res := getListResult(left,ob)
-            switch res {
-            case True:
-                return True
-            case False:
-                return False
-            default:
-                continue
-            }
-            //compare left is int, right is list
-        } else if oa.t == 2 && ob.t == 1 {
-            //compare left is list, right is int
-            right := Obj{list:[]Obj{ob},t:2}
-            res := getListResult(oa,right)
-            switch res {
-            case True:
-                return True
-            case False:
-                return False
-            default:
-                continue
-            }
-        }
-    }
-
-    return True
-}
-
 func getIntResult(a Obj, b Obj) Result {
-    // fmt.Printf("Compare ints\n")
     if a.val < b.val {
+        fmt.Printf("Compare ints %d vs %d. Res %s\n", a.val, b.val, "true")
         return True
     } else if (a.val > b.val) {
+        fmt.Printf("Compare ints %d vs %d. Res %s\n", a.val, b.val, "false")
         return False
     }
+    fmt.Printf("Compare ints %d vs %d. Res %s\n", a.val, b.val, "continue")
     return Continue
 }
 
@@ -211,34 +167,35 @@ func (q *Queue) Size() int {
     return len(q.queue)
 }
 
-func getObj(l string) []Obj {
-    // strArr := strings.Split(l, "")
+func getObj(l string) Obj {
+    strArr := strings.Split(l, "")
     // fmt.Printf("%s\n", l[1:len(l)-1])
     // remove first and last character
-    strArr := strings.Split(l[1:len(l)-1], "")
+    // strArr := strings.Split(l[1:len(l)-1], "")
 
     queue := Queue{strArr}
 
-    list := make([]Obj, 0)
+    var result Obj
 
     for queue.Size() > 0 {
         s := queue.Pop()
-        // fmt.Printf("%s\n", s)
-        if s == "[" {
-            obj := getListObj(s,&queue)
-            list = append(list, obj)
-            continue
-        }
-        if s == "," {
-            // fmt.Printf("comma. continue\n")
-            continue
-        }
-        obj := getNumberObj(s, &queue)
-        list = append(list, obj)
+        result = getListObj(s,&queue)
+        // // fmt.Printf("%s\n", s)
+        // if s == "[" {
+        //     obj := getListObj(s,&queue)
+        //     list = append(list, obj)
+        //     continue
+        // }
+        // if s == "," {
+        //     // fmt.Printf("comma. continue\n")
+        //     continue
+        // }
+        // obj := getNumberObj(s, &queue)
+        // list = append(list, obj)
     }
     // fmt.Printf("\n")
 
-    return list
+    return result
 }
 
 func getNumberObj(s string, queue *Queue) Obj {
@@ -288,8 +245,26 @@ type Obj struct {
     val int
 }
 
+func (o *Obj)ToString() string {
+    s := ""
+    if o.t == 1 {
+        return fmt.Sprintf("%d", o.val)
+    }
+    if o.t == 2 {
+        s += "["
+        for i, obj := range o.list {
+            s += obj.ToString()
+            if i != len(o.list)-1 {
+                s += ","
+            }
+        }
+        s += "]"
+    }
+    return s
+}
+
 type Pair struct {
-    l1 []Obj
-    l2 []Obj
+    o1 Obj
+    o2 Obj
     idx int
 }
