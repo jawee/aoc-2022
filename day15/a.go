@@ -23,7 +23,7 @@ func A() {
 	scanner := bufio.NewScanner(file)
 
     sensors := make([]Sensor, 0)
-    m := make(map[string]bool)
+    // m := make(map[string]bool)
 	for scanner.Scan() {
 		l1 := scanner.Text()
         // l1 := "Sensor at x=8, y=7: closest beacon is at x=2, y=10"
@@ -34,74 +34,109 @@ func A() {
         bX := getNumber(l[8])
         bY := getNumber(l[9])
 
-        beacon := Beacon{bX, bY}
-        sensor := Sensor{sX, sY, beacon}
         dist := getManhattanDistance(sX,sY,bX,bY)
+        beacon := Beacon{bX, bY}
+        sensor := Sensor{sX, sY, beacon, dist}
         sensors = append(sensors, sensor)
-        setCantBeBeacon(sensor, beacon, dist, m)
 
         // fmt.Printf("%d %d %d %d %d\n", sX, sY, bX, bY, dist)
 	}
 
 
-    notBeaconCount := getNotBeaconCount(10, m)
+
+
+    notBeaconCount := getNotBeaconCount(10, sensors)
     fmt.Printf("%d\n", notBeaconCount)
+    fmt.Printf("5217008 is too high \n")
 }
 
-func getNotBeaconCount(y int, m map[string]bool) int {
+func getNotBeaconCount(y int, sensors []Sensor) int {
     max := 0
     min := 9999999999999999
-
-    for k := range m {
-        // fmt.Printf("%s\n", k)
-        p := strings.Split(k, ",")
-        x, _ := strconv.Atoi(p[0])
-        if x > max {
-            max = x
+    for _, s := range sensors {
+        if s.x-s.dist < min {
+            min = s.x-s.dist
         }
-        if x < min {
-            min = x
+        if s.x+s.dist > max {
+            max = s.x+s.dist
         }
     }
 
-    // fmt.Printf("%v", m)
-    // sum := len(sensors)
-	fmt.Printf("%d %d\n", min,max)
+    fmt.Printf("%d, %d\n", min, max)
     count := 0
-
     for _, x := range getRange(min,max) {
-        s := fmt.Sprintf("%d,%d", x, y)
-        // fmt.Printf("%s %v\n", s, m[s])
-        if m[s] == true {
+        b := false
+        for _, s := range sensors {
+            if s.b.x == x && s.b.y == y {
+                b = false
+                break
+            }
+            if getManhattanDistance(s.x,s.y,x,y) <= s.dist {
+                b = true
+                break
+            }
+        }
+        if b {
             count++
         }
     }
+
     return count
 }
 
+// func getNotBeaconCount(y int, m map[string]bool) int {
+//     max := 0
+//
+//     for k := range m {
+//         // fmt.Printf("%s\n", k)
+//         p := strings.Split(k, ",")
+//         x, _ := strconv.Atoi(p[0])
+//         if x > max {
+//             max = x
+//         }
+//         if x < min {
+//             min = x
+//         }
+//     }
+//
+//     // fmt.Printf("%v", m)
+//     // sum := len(sensors)
+// 	fmt.Printf("%d %d\n", min,max)
+//     count := 0
+//
+//     for _, x := range getRange(min,max) {
+//         s := fmt.Sprintf("%d,%d", x, y)
+//         // fmt.Printf("%s %v\n", s, m[s])
+//         if m[s] == true {
+//             count++
+//         }
+//     }
+//     return count
+// }
 
 
-func setCantBeBeacon(s Sensor, b Beacon, dist int, m map[string]bool) {
-    fmt.Printf("=============setCantBeBeacon=========================\n")
-    xR := getRange(s.x-dist, s.x+dist)
-    yR := getRange(s.y-dist, s.y+dist)
-    fmt.Printf("xR: %d\n", len(xR))
-    fmt.Printf("yR: %d\n", len(yR))
-    for _, x := range xR  {
-        for _,y := range yR {
-            if getManhattanDistance(s.x, s.y, x, y) > dist {
-                // fmt.Printf("%d,%d is too far away\n", x,y)
-                continue
-            }
-            if b.x == x && b.y == y {
-                // fmt.Printf("%d,%d is equal to %d, %d\n", x,y,b.x,b.y)
-            } else {
-                // fmt.Printf("Marking true.%d,%d\n", x, y)
-                // m[fmt.Sprintf("%d,%d", x, y)] = true
-            }
-        }
-    }
-}
+
+// func setCantBeBeacon(s Sensor, b Beacon, dist int, m map[string]bool) {
+//     fmt.Printf("=============setCantBeBeacon=========================\n")
+//     xR := getRange(s.x-dist, s.x+dist)
+//     yR := getRange(s.y-dist, s.y+dist)
+//     fmt.Printf("xR: %d\n", len(xR))
+//     fmt.Printf("yR: %d\n", len(yR))
+//     for _, x := range xR  {
+//         for _,y := range yR {
+//             if getManhattanDistance(s.x, s.y, x, y) > dist {
+//                 // fmt.Printf("%d,%d is too far away\n", x,y)
+//                 continue
+//             }
+//             if b.x == x && b.y == y {
+//                 // fmt.Printf("%d,%d is equal to %d, %d\n", x,y,b.x,b.y)
+//             } else {
+//                 // fmt.Printf("Marking true.%d,%d\n", x, y)
+//                 // m[fmt.Sprintf("%d,%d", x, y)] = true
+//             }
+//         }
+//     }
+// }
 
 func getRange(a,b int) []int {
     r := make([]int, 0)
@@ -143,6 +178,7 @@ type Sensor struct {
     x int
     y int
     b Beacon
+    dist int
 }
 
 type Beacon struct {
