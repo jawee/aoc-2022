@@ -10,8 +10,8 @@ import (
 
 func A() {
 	pwd, _ := os.Getwd()
-	file, err := os.Open(pwd + "/day14/testinput.txt")
-	// file, err := os.Open(pwd + "/day14/input.txt")
+	// file, err := os.Open(pwd + "/day14/testinput.txt")
+	file, err := os.Open(pwd + "/day14/input.txt")
 
 	if err != nil {
 		fmt.Println(err)
@@ -21,70 +21,61 @@ func A() {
 
 	scanner := bufio.NewScanner(file)
 
-    objs := make(map[string]Obj)
+    objs := make(map[string]int)
     // rocks := make([]Rock, 0)
 	for scanner.Scan() {
 		l1 := scanner.Text()
         getRocksForInput(l1, objs)
 	}
 
-    sum := len(objs)
-    for k := range objs {
-        fmt.Println(k)
+    // sum := len(objs)
+    // for k := range objs {
+    //     fmt.Println(k)
+    // }
+    sum := 0
+    for dropSand(500, objs) {
+       sum++
     }
 	fmt.Printf("%d\n", sum)
 }
 
-func dropSand(x int, rl map[string]Obj) {
-    fmt.Printf("Dropping sand from x: %d\n", x)
-    _ = dropSandRec(x, 0, rl)
-    fmt.Printf("dropSand:%v\n", rl)
-
+func dropSand(x int, rl map[string]int) bool {
+    // fmt.Printf("Dropping sand from x: %d\n", x)
+    res := dropSandRec(x, 0, rl)
+    // fmt.Printf("dropSand:%v\n", rl)
+    return res
 }
 
-func dropSandRec(x, y int, rl map[string]Obj) bool {
+func dropSandRec(x, y int, rl map[string]int) bool {
     maxY := getMaxY(rl)
-    val, exists := rl[fmt.Sprintf("%d,%d", x, y+1)]
-    fmt.Printf("%v, %v\n", exists, val)
-    if y > maxY {
-        //falling to infinity
+
+    if maxY < y+1 {
         fmt.Printf("Falling to infinity\n")
         return false
     }
-    if exists && val.t == 1 {
-        fmt.Printf("Exists and is rock\n")
-        //rock hit
-        // check diagonally
-        // handle logic when rock is diagonally 
-        if x-1 >= 0 {
-            res := dropSandRec(x-1, y+1, rl)
-            if res {
-                return res
-            }
-        }
-        res := dropSandRec(x+1, y+1, rl)
-        if !res {
-            rl[fmt.Sprintf("%d,%d", x, y)] = Obj{t:2}
-        }
-        return res
-    }
-    if !exists {
-        if maxY < y+1 {
-            return false
-        }
-        fmt.Printf("Recurse\n")
+
+    _, downExists := rl[fmt.Sprintf("%d,%d", x, y+1)]
+    if !downExists {
         return dropSandRec(x, y+1, rl)
     }
-    // rl[fmt.Sprintf("%d,%d", x, y)] = Obj{t:1}
-    rl[fmt.Sprintf("%d,%d", x, y)] = Obj{t:2}
-    fmt.Printf("dropSandRec:%v\n", rl)
+    _, leftExists := rl[fmt.Sprintf("%d,%d", x-1, y+1)]
+    if !leftExists {
+        return dropSandRec(x-1, y+1, rl)
+    }
+    _, rightExists := rl[fmt.Sprintf("%d,%d", x+1, y+1)]
+    if !rightExists {
+        return dropSandRec(x+1, y+1, rl)
+    }
+
+    fmt.Printf("Creating sand at %d,%d\n", x, y)
+    rl[fmt.Sprintf("%d,%d", x, y)] = 2
     return true
 }
 
-func getMaxY(rl map[string]Obj) int {
+func getMaxY(rl map[string]int) int {
     max := 0
 
-    for k, _ := range rl {
+    for k := range rl {
         p := strings.Split(k, ",")
         y, _ := strconv.Atoi(p[1])
         if y > max {
@@ -95,7 +86,7 @@ func getMaxY(rl map[string]Obj) int {
     return max
 }
 
-func getRocksForInput(l1 string, rl map[string]Obj) {
+func getRocksForInput(l1 string, rl map[string]int) {
     segments := strings.Split(l1, "->")
     fx := -1
     fy := -1
@@ -121,14 +112,14 @@ func getRocksForInput(l1 string, rl map[string]Obj) {
                 dir = 1
                 for y >= fy {
                     // fmt.Printf("Creating rock at %d,%d\n", x,fy)
-                    rl[fmt.Sprintf("%d,%d", x, fy)] = Obj{t:1}
+                    rl[fmt.Sprintf("%d,%d", x, fy)] = 1
                     fy += dir
                 }
             } else {
                 dir = -1
                 for y <= fy {
                     // fmt.Printf("Creating rock at %d,%d\n", x,fy)
-                    rl[fmt.Sprintf("%d,%d", x, fy)] = Obj{t:1}
+                    rl[fmt.Sprintf("%d,%d", x, fy)] = 1
                     fy += dir
                 }
             }
@@ -143,14 +134,14 @@ func getRocksForInput(l1 string, rl map[string]Obj) {
                 dir = 1
                 for x >= fx {
                     // fmt.Printf("Creating rock at %d,%d\n", fx,y)
-                    rl[fmt.Sprintf("%d,%d", fx, y)] = Obj{t:1}
+                    rl[fmt.Sprintf("%d,%d", fx, y)] = 1 
                     fx += dir
                 }
             } else {
                 dir = -1
                 for x <= fx {
                     // fmt.Printf("Creating rock at %d,%d\n", fx,y)
-                    rl[fmt.Sprintf("%d,%d", fx, y)] = Obj{t:1}
+                    rl[fmt.Sprintf("%d,%d", fx, y)] = 1
                     fx += dir
                 }
             }
@@ -161,8 +152,4 @@ func getRocksForInput(l1 string, rl map[string]Obj) {
     }
 
     // return rl
-}
-
-type Obj struct {
-    t int
 }

@@ -13,23 +13,21 @@ func TestDropSand(t *testing.T) {
         expected []string
     }{
         {"1,2 -> 3,2", 2, 1, []string{"1,2","2,2","3,2","2,1"}},
-        {"1,2 -> 3,2", 2, 2, []string{"1,2","2,2","3,2","2,1","1,1"}},
-        // {"1,2 -> 3,2", 2, 3, []string{"1,2","2,2","3,2","2,1","1,1","3,1"}},
-        // {"1,2 -> 3,2", 2, 4, []string{"1,2","2,2","3,2","2,1","1,1","3,1", "2,0"}},
-        // {"1,2 -> 3,2", 2, 5, []string{"1,2","2,2","3,2","2,1","1,1","3,1", "2,0"}},
+        {"0,2 -> 4,2", 2, 2, []string{"0,2","1,2","2,2","3,2","4,2","2,1","1,1"}},
     }
 
     for _, c := range cases {
         fmt.Printf("#########################\n")
-        fmt.Printf("Testcase %s\n", c.input)
+        fmt.Printf("Testcase drop sand %d times\n", c.n)
         fmt.Printf("#########################\n")
 
-        m := make(map[string]Obj)
+        m := make(map[string]int)
         getRocksForInput(c.input, m)
 
         for i := 0; i < c.n; i++ {
-            dropSand(c.x, m)
+            _ = dropSand(c.x, m)
         }
+
 
         if len(m) != len(c.expected) {
             t.Fatalf("Expected length %d, got %d\n", len(c.expected), len(m))
@@ -60,7 +58,7 @@ func TestGetRocks(t *testing.T) {
         fmt.Printf("#########################\n")
         fmt.Printf("Testcase %s\n", c.input)
         fmt.Printf("#########################\n")
-        m := make(map[string]Obj)
+        m := make(map[string]int)
         getRocksForInput(c.input, m)
 
         if len(m) != len(c.expected) {
