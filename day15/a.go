@@ -1,33 +1,33 @@
 package day15
 
 import (
-	"bufio"
-	"fmt"
-	"math"
-	"os"
-	"strconv"
-	"strings"
+    "bufio"
+    "fmt"
+    "math"
+    "os"
+    "strconv"
+    "strings"
 )
 
 func A() {
-	pwd, _ := os.Getwd()
-	// file, err := os.Open(pwd + "/day15/testinput.txt")
- //    y := 10
-	file, err := os.Open(pwd + "/day15/input.txt")
+    pwd, _ := os.Getwd()
+    // file, err := os.Open(pwd + "/day15/testinput.txt")
+    //    y := 10
+    file, err := os.Open(pwd + "/day15/input.txt")
     y := 2000000
 
-	if err != nil {
-		fmt.Println(err)
-	}
+    if err != nil {
+        fmt.Println(err)
+    }
 
-	defer file.Close()
+    defer file.Close()
 
-	scanner := bufio.NewScanner(file)
+    scanner := bufio.NewScanner(file)
 
     sensors := make([]Sensor, 0)
     // m := make(map[string]bool)
-	for scanner.Scan() {
-		l1 := scanner.Text()
+    for scanner.Scan() {
+        l1 := scanner.Text()
         // l1 := "Sensor at x=8, y=7: closest beacon is at x=2, y=10"
         // fmt.Printf("%s\n", l1)
         l := strings.Split(l1, " ")
@@ -42,7 +42,7 @@ func A() {
         sensors = append(sensors, sensor)
 
         // fmt.Printf("%d %d %d %d %d\n", sX, sY, bX, bY, dist)
-	}
+    }
 
     notBeaconCount := getNotBeaconCount(y, sensors)
     fmt.Printf("%d\n", notBeaconCount)
@@ -86,13 +86,13 @@ func getRange(a,b int) []int {
     r := make([]int, 0)
 
     for a <= b {
-       r = append(r,a)
-       a++
+        r = append(r,a)
+        a++
     }
 
     for a >= b {
-       r = append(r,a)
-       a--
+        r = append(r,a)
+        a--
     }
 
     return r
