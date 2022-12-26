@@ -8,13 +8,24 @@ import (
 func TestOneSensor(t *testing.T) {
     //Sensor at x=8, y=7: closest beacon is at x=2, y=10
     beacon := Beacon{2, 10}
-    sensor := Sensor{8, 7, beacon}
     dist := getManhattanDistance(8,7,2,10)
-    m := make(map[string]bool)
-    setCantBeBeacon(sensor, beacon, dist, m)
-    fmt.Printf("len %d\n", len(m))
+    sensor := Sensor{8, 7, beacon,dist}
 
-    _ = getNotBeaconCount(10, m)
+    res := getNotBeaconCount(10, []Sensor{sensor})
+    if res != 12 {
+        t.Fatalf("Expected 12, Got %d\n", res)
+    }
+}
+func TestTwoSensor(t *testing.T) {
+    //Sensor at x=8, y=7: closest beacon is at x=2, y=10
+    beacon := Beacon{2, 10}
+    dist := getManhattanDistance(8,7,2,10)
+    sensor := Sensor{8, 7, beacon,dist}
+
+    res := getNotBeaconCount(10, []Sensor{sensor})
+    if res != 12 {
+        t.Fatalf("Expected 12, Got %d\n", res)
+    }
 }
 func TestGetNumber(t *testing.T) {
     s := "=-1"

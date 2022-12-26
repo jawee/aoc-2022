@@ -12,7 +12,9 @@ import (
 func A() {
 	pwd, _ := os.Getwd()
 	// file, err := os.Open(pwd + "/day15/testinput.txt")
+ //    y := 10
 	file, err := os.Open(pwd + "/day15/input.txt")
+    y := 2000000
 
 	if err != nil {
 		fmt.Println(err)
@@ -42,12 +44,8 @@ func A() {
         // fmt.Printf("%d %d %d %d %d\n", sX, sY, bX, bY, dist)
 	}
 
-
-
-
-    notBeaconCount := getNotBeaconCount(10, sensors)
+    notBeaconCount := getNotBeaconCount(y, sensors)
     fmt.Printf("%d\n", notBeaconCount)
-    fmt.Printf("5217008 is too high \n")
 }
 
 func getNotBeaconCount(y int, sensors []Sensor) int {
@@ -62,7 +60,6 @@ func getNotBeaconCount(y int, sensors []Sensor) int {
         }
     }
 
-    fmt.Printf("%d, %d\n", min, max)
     count := 0
     for _, x := range getRange(min,max) {
         b := false
@@ -77,66 +74,13 @@ func getNotBeaconCount(y int, sensors []Sensor) int {
             }
         }
         if b {
+            // fmt.Printf("#")
             count++
-        }
+        } 
     }
 
     return count
 }
-
-// func getNotBeaconCount(y int, m map[string]bool) int {
-//     max := 0
-//
-//     for k := range m {
-//         // fmt.Printf("%s\n", k)
-//         p := strings.Split(k, ",")
-//         x, _ := strconv.Atoi(p[0])
-//         if x > max {
-//             max = x
-//         }
-//         if x < min {
-//             min = x
-//         }
-//     }
-//
-//     // fmt.Printf("%v", m)
-//     // sum := len(sensors)
-// 	fmt.Printf("%d %d\n", min,max)
-//     count := 0
-//
-//     for _, x := range getRange(min,max) {
-//         s := fmt.Sprintf("%d,%d", x, y)
-//         // fmt.Printf("%s %v\n", s, m[s])
-//         if m[s] == true {
-//             count++
-//         }
-//     }
-//     return count
-// }
-
-
-
-// func setCantBeBeacon(s Sensor, b Beacon, dist int, m map[string]bool) {
-//     fmt.Printf("=============setCantBeBeacon=========================\n")
-//     xR := getRange(s.x-dist, s.x+dist)
-//     yR := getRange(s.y-dist, s.y+dist)
-//     fmt.Printf("xR: %d\n", len(xR))
-//     fmt.Printf("yR: %d\n", len(yR))
-//     for _, x := range xR  {
-//         for _,y := range yR {
-//             if getManhattanDistance(s.x, s.y, x, y) > dist {
-//                 // fmt.Printf("%d,%d is too far away\n", x,y)
-//                 continue
-//             }
-//             if b.x == x && b.y == y {
-//                 // fmt.Printf("%d,%d is equal to %d, %d\n", x,y,b.x,b.y)
-//             } else {
-//                 // fmt.Printf("Marking true.%d,%d\n", x, y)
-//                 // m[fmt.Sprintf("%d,%d", x, y)] = true
-//             }
-//         }
-//     }
-// }
 
 func getRange(a,b int) []int {
     r := make([]int, 0)
