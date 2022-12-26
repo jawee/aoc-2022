@@ -35,8 +35,19 @@ func A() {
         tunnels := strings.Split(strings.Replace(match[3]," ","", -1), ",")
         
         m[name] = Valve{fr, tunnels}
-        fmt.Printf("%s name, fr %d, leads to %v. Len %d\n", name, fr, tunnels, len(tunnels))
+        // fmt.Printf("%s name, fr %d, leads to %v. Len %d\n", name, fr, tunnels, len(tunnels))
     }
+
+    pr := getReleasedPressure("AA", m, 30)
+    fmt.Printf("Total pressure released %d\n", pr)
+
+}
+
+func getReleasedPressure(start string, m map[string]Valve, minutes int) int {
+    s := m[start]
+    fmt.Printf("%v\n", s)
+    // opened := make(map[string]bool)
+    return 0
 }
 
 type Valve struct {
