@@ -23,6 +23,7 @@ func A() {
 
     objs := make(map[string]int)
     // rocks := make([]Rock, 0)
+
 	for scanner.Scan() {
 		l1 := scanner.Text()
         getRocksForInput(l1, objs)
